@@ -8,4 +8,6 @@ import (
 func SetupRoutes(app *fiber.App) {
 
 	app.Get("/get/:url", handler.GetURL)
+	app.Post("/api", handler.URLShortner)
+
 }
