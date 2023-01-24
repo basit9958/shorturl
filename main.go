@@ -16,4 +16,6 @@ func main() {
 	router.SetupRoutes(app)
 
 	app.Listen(":3000")
+	fmt.Printf("got an error while listen %s", err)
+
 }
