@@ -2,11 +2,10 @@ package handler
 
 import (
 	"github.com/basit9958/shorturl/database"
-	"github.com/basit9958/shorturl/models"
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetURL(app *fiber.Ctx) error {
+func RedirectURL(app *fiber.Ctx) error {
 
 	// Short URL from the Params
 	url := app.Params("url")
@@ -18,12 +17,11 @@ func GetURL(app *fiber.Ctx) error {
 	longURL, err := db1.Get(database.Ctx, url).Result()
 
 	if err != nil {
-		return err
+		return app.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "unable to find the key",
+		})
 	}
+	//	Redirect the request to the long URL
+	return app.Redirect(longURL, fiber.StatusPermanentRedirect)
 
-	reponsebody := models.Response{
-		URL:      longURL,
-		ShortUrl: url,
-	}
-	return app.JSON(reponsebody)
 }

@@ -11,7 +11,7 @@ func URLShortner(app *fiber.Ctx) error {
 
 	requestBody := new(models.Request)
 
-	if err := app.BodyParser(&requestBody); err != nil {
+	if err := app.BodyParser(requestBody); err != nil {
 		return app.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "cannot Parse the Request ",
 		})
@@ -33,10 +33,7 @@ func URLShortner(app *fiber.Ctx) error {
 
 	// Check Whether the Short URL is already present in the database or not
 	// Possible value Empty or String
-	longURL, err := db1.Get(database.Ctx, rndId).Result()
-	if err != nil {
-		return err
-	}
+	longURL, _ := db1.Get(database.Ctx, rndId).Result()
 
 	if longURL != "" {
 		return app.Status(fiber.StatusForbidden).JSON(fiber.Map{
@@ -44,18 +41,12 @@ func URLShortner(app *fiber.Ctx) error {
 		})
 	}
 
-	db1.Set(database.Ctx, rndId, requestBody.URL, requestBody.Expiration)
 	// Set the Short value into the database
-	err = db1.Set(database.Ctx, rndId, requestBody.URL, requestBody.Expiration).Err()
-	if err != nil {
-		return app.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "unable to connect to server",
-		})
-	}
+	_ = db1.Set(database.Ctx, rndId, requestBody.URL, requestBody.Expiration).Err()
 
 	resp := models.Response{
 		URL:        requestBody.URL,
-		ShortUrl:   "localhost:3000" + rndId,
+		ShortUrl:   "localhost:3000" + "/" + rndId,
 		Expiration: requestBody.Expiration,
 	}
 
